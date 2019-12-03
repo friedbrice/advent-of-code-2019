@@ -13,11 +13,10 @@ eval op cntr prgm = do
   w <- op <$> Map.lookup x prgm <*> Map.lookup y prgm
   apply (cntr + 4) (Map.insert z w prgm)
 
-apply cntr prgm =
-  case Map.lookup cntr prgm of
-    Just 99 -> Just prgm
-    Just n -> opcode n >>= \op -> eval op cntr prgm
-    _ -> Nothing
+apply cntr prgm = do
+  n <- Map.lookup cntr prgm
+  if n == 99 then return prgm
+  else opcode n >>= \op -> eval op cntr prgm
 
 seek target prgm =
   [ (noun, verb) | noun <- [0..99]
