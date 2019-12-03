@@ -1,3 +1,4 @@
+import Control.Monad (guard)
 import qualified Data.Map as Map
 
 mkIntcode = Map.fromList . zip [0..]
@@ -18,17 +19,18 @@ apply cntr prgm = do
   if n == 99 then return prgm
   else opcode n >>= \op -> eval op cntr prgm
 
-seek target prgm =
-  [ (noun, verb) | noun <- [0..99]
-                 , verb <- [0..99]
-                 , run noun verb prgm == Just target
-                 ]
-  where
+seek target prgm = do
+  let
     run noun verb =
       (=<<) (Map.lookup 0)
       . apply 0
       . Map.insert 2 verb
       . Map.insert 1 noun
+
+  noun <- [0..99]
+  verb <- [0..99]
+  guard (run noun verb prgm == Just target)
+  return (noun, verb)
 
 main = do
   let
