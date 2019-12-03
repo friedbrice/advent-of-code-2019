@@ -17,7 +17,9 @@ eval op cntr prgm = do
 apply cntr prgm = do
   n <- Map.lookup cntr prgm
   if n == 99 then return prgm
-  else opcode n >>= \op -> eval op cntr prgm
+  else do
+    op <- opcode n
+    eval op cntr prgm
 
 seek target prgm = do
   let
